@@ -1,0 +1,30 @@
+@startuml 03-secuencia-mensaje-bloqueado
+title Secuencia — mensaje de 201 caracteres recorriendo la cadena
+
+skinparam shadowing false
+
+actor Launcher
+participant "DangerousContentMessageSender" as Danger
+participant "MaxLengthMessageSender" as Length
+participant "RateLimitMessageSender" as Rate
+participant "MessagingClient" as Client
+participant "BlockedMessageLogger" as Log
+
+Launcher -> Danger : sendMessage("aaa…a" 201 chars)
+activate Danger
+Danger -> Danger : isAllowed() → true\n(no contiene ##{...})
+Danger -> Length : sendMessage(...)
+activate Length
+Length -> Length : isAllowed() → false\n(201 > 200)
+Length -> Log : log("Mensaje bloqueado por\nexceder la longitud máxima permitida")
+deactivate Length
+Danger --> Launcher
+deactivate Danger
+
+note over Rate, Client
+  La llamada nunca llega al limitador de frecuencia
+  ni al cliente de terceros: el mensaje bloqueado
+  no consume cupo de la ventana de 1 segundo.
+end note
+
+@enduml

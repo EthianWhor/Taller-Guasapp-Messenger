@@ -1,0 +1,16 @@
+Verificación: la clase de terceros MessagingClient no fue modificada
+Fecha: 2026-08-16
+----------------------------------------------------------------------
+
+$ git diff --stat HEAD -- src/main/java/edu/unisabana/dyas/patterns/util/
+(sin salida = cero cambios en el paquete util, que contiene MessagingClient y MessageSender)
+
+$ git status --porcelain -- src/main/java/edu/unisabana/dyas/patterns/util/
+(sin salida = ningún archivo del paquete util aparece como modificado)
+
+$ git log --oneline -1 -- src/main/java/edu/unisabana/dyas/patterns/util/MessagingClient.java
+2dea6ed Correciones a taller
+(último commit que tocó el archivo: el de la plantilla base del profesor)
+
+$ grep -nE '\b(if|switch)\b' src/main/java/edu/unisabana/dyas/patterns/GuasappProgramLauncher.java
+(sin salida = el launcher no ramifica por tipo de validación)

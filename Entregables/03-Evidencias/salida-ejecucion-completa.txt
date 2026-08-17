@@ -1,0 +1,11 @@
+Comando: mvn exec:java -Dexec.mainClass=edu.unisabana.dyas.patterns.GuasappProgramLauncher
+Fecha: 2026-08-16
+----------------------------------------------------------------------
+Sending message: Hola, ¿cómo estás?
+Mensaje bloqueado debido a contenido peligroso
+Mensaje bloqueado por exceder la longitud máxima permitida
+Sending message: Mensaje de ráfaga #1
+Sending message: Mensaje de ráfaga #2
+Sending message: Mensaje de ráfaga #3
+Mensaje bloqueado por exceso de frecuencia de envío
+Mensaje bloqueado por exceso de frecuencia de envío

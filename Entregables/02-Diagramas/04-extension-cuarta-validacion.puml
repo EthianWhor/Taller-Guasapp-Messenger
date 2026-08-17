@@ -1,0 +1,46 @@
+@startuml 04-extension-cuarta-validacion
+title Principio abierto/cerrado — cómo entra una cuarta validación
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+interface MessageSender {
+  + sendMessage(message: String): void
+}
+
+abstract class MessageSenderDecorator {
+  # {abstract} isAllowed(message: String): boolean
+  # {abstract} blockedReason(): String
+}
+
+class DangerousContentMessageSender <<existente — sin cambios>>
+class MaxLengthMessageSender <<existente — sin cambios>>
+class RateLimitMessageSender <<existente — sin cambios>>
+class MessagingClient <<terceros — sin cambios>>
+
+class BlockedWordsMessageSender <<NUEVA>> #LightGreen {
+  - blockedWords: Set<String>
+  # isAllowed(message: String): boolean
+  # blockedReason(): String
+}
+
+MessagingClient ..|> MessageSender
+MessageSenderDecorator ..|> MessageSender
+MessageSenderDecorator o--> "1" MessageSender
+
+DangerousContentMessageSender --|> MessageSenderDecorator
+MaxLengthMessageSender --|> MessageSenderDecorator
+RateLimitMessageSender --|> MessageSenderDecorator
+BlockedWordsMessageSender --|> MessageSenderDecorator
+
+note bottom of BlockedWordsMessageSender
+  Agregar una cuarta validación exige únicamente:
+  1. crear esta clase (2 métodos),
+  2. sumarla al armado de la cadena en el launcher.
+
+  No se modifica ninguna de las tres validaciones
+  existentes, ni MessageSenderDecorator,
+  ni MessagingClient.
+end note
+
+@enduml

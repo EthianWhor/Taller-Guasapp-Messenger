@@ -1,0 +1,74 @@
+@startuml 02-decorator-estructura
+title Estructura de la solución — patrón Decorator sobre MessageSender
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+interface MessageSender <<Component>> {
+  + sendMessage(message: String): void
+}
+
+class MessagingClient <<ConcreteComponent — no modificable>> {
+  + sendMessage(message: String): void
+}
+
+abstract class MessageSenderDecorator <<Decorator>> {
+  - wrapped: MessageSender
+  - logger: BlockedMessageLogger
+  + {final} sendMessage(message: String): void
+  # {abstract} isAllowed(message: String): boolean
+  # {abstract} blockedReason(): String
+}
+
+class DangerousContentMessageSender <<ConcreteDecorator>> {
+  - {static} DANGEROUS_PATTERN: Pattern
+  # isAllowed(message: String): boolean
+  # blockedReason(): String
+}
+
+class MaxLengthMessageSender <<ConcreteDecorator>> {
+  - maxLength: int = 200
+  # isAllowed(message: String): boolean
+  # blockedReason(): String
+}
+
+class RateLimitMessageSender <<ConcreteDecorator>> {
+  - maxMessages: int = 3
+  - windowMillis: long = 1000
+  - sentTimestamps: Deque<Long>
+  # isAllowed(message: String): boolean
+  # blockedReason(): String
+}
+
+interface BlockedMessageLogger {
+  + log(reason: String): void
+}
+
+interface TimeSource {
+  + currentTimeMillis(): long
+}
+
+class SystemTimeSource {
+  + currentTimeMillis(): long
+}
+
+MessagingClient ..|> MessageSender
+MessageSenderDecorator ..|> MessageSender
+MessageSenderDecorator o--> "1" MessageSender : wrapped
+MessageSenderDecorator --> BlockedMessageLogger
+
+DangerousContentMessageSender --|> MessageSenderDecorator
+MaxLengthMessageSender --|> MessageSenderDecorator
+RateLimitMessageSender --|> MessageSenderDecorator
+
+RateLimitMessageSender --> TimeSource
+SystemTimeSource ..|> TimeSource
+
+note right of MessageSenderDecorator
+  sendMessage() es final y concentra la lógica común:
+  si isAllowed() → delega al siguiente eslabón,
+  si no → registra blockedReason() y corta.
+  Ninguna validación conoce a las otras.
+end note
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml 01-modelo-inicial
+title Modelo inicial — el launcher habla directamente con el cliente de terceros
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+interface MessageSender <<util>> {
+  + sendMessage(message: String): void
+}
+
+class MessagingClient <<terceros — no modificable>> {
+  + sendMessage(message: String): void
+}
+
+class GuasappProgramLauncher {
+  + {static} main(args: String[]): void
+}
+
+MessagingClient ..|> MessageSender
+GuasappProgramLauncher --> MessagingClient : usa la clase concreta
+
+note bottom of GuasappProgramLauncher
+  Todo mensaje llega al cliente sin filtro alguno:
+  · contenido peligroso ##{...}
+  · mensajes de más de 200 caracteres
+  · ráfagas de más de 3 mensajes por segundo
+end note
+
+@enduml
